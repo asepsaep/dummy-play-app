@@ -1,4 +1,6 @@
-@(signInForm: Form[forms.SignUpForm.Data])(implicit request: RequestHeader, messages: Messages, webJarAssets: WebJarAssets)
+@import com.nappin.play.recaptcha.WidgetHelper
+
+@(signUpForm: Form[forms.SignUpForm.Data])(implicit request: Request[AnyContent], messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper)
 
 @import b3.inline.fieldConstructor
 
@@ -13,10 +15,11 @@
         <legend>@Messages("sign.up.account")</legend>
         @helper.form(action = routes.SignUpController.submit()) {
             @helper.CSRF.formField
-            @b3.text(signInForm("username"), '_hiddenLabel -> Messages("username"), 'placeholder -> Messages("username"), 'class -> "form-control input-lg")
-            @b3.text(signInForm("name"), '_hiddenLabel -> Messages("name"), 'placeholder -> Messages("name"), 'class -> "form-control input-lg")
-            @b3.email(signInForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
-            @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
+            @b3.text(signUpForm("username"), '_hiddenLabel -> Messages("username"), 'placeholder -> Messages("username"), 'class -> "form-control input-lg")
+            @b3.text(signUpForm("name"), '_hiddenLabel -> Messages("name"), 'placeholder -> Messages("name"), 'class -> "form-control input-lg")
+            @b3.email(signUpForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
+            @b3.password(signUpForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
+            @recaptcha.recaptchaField(form = signUpForm, fieldName = "", includeNoScript = false, isRequired = false)
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@Messages("sign.up")</button>

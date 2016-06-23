@@ -54,3 +54,14 @@ class OAuth2InfoTable(tag: Tag) extends Table[DBOAuth2Info](tag, "oauth2_info") 
   override def * = (accessToken, tokenType.?, expiresIn.?, refreshToken.?, params.?, accountUsername) <> ((DBOAuth2Info.apply _).tupled, DBOAuth2Info.unapply _)
 
 }
+
+class TokenInfoTable(tag: Tag) extends Table[TokenInfo](tag, "token_info") {
+
+  def token = column[String]("token", O.PrimaryKey)
+  def email = column[String]("email")
+  def expiresAt = column[OffsetDateTime]("expires_at")
+  def accountUsername = column[String]("account_username")
+
+  override def * = (token, email, expiresAt, accountUsername) <> (TokenInfo.tupled, TokenInfo.unapply _)
+
+}

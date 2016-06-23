@@ -1,6 +1,6 @@
 package controllers
 
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
@@ -20,6 +20,8 @@ import play.api.libs.concurrent.Execution.Implicits._
  * @param socialProviderRegistry The social provider registry.
  * @param webJarAssets The webjar assets implementation.
  */
+
+@Singleton
 class ApplicationController @Inject() (
   val messagesApi:           MessagesApi,
   silhouette:                Silhouette[DefaultEnv],

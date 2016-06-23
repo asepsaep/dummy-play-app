@@ -12,29 +12,37 @@ scalaVersion := "2.11.8"
 lazy val versions = new {
   val silhouette = "4.0.0-RC1"
   val guice = "4.0.1"
+  val akka = "2.4.7"
   val slick = "3.1.1"
   val playSlick = "2.0.0"
   val psqlJdbc = "9.4-1206-jdbc41"
   val slickPostgres = "0.14.1"
+  val playMailer = "5.0.0-M1"
   val ficus = "1.2.6"
   val webjars = "2.5.0-2"
   val playBootstrap = "1.0-P25-B3"
   val scalatest = "2.2.6"
 }
 
+fork in run := true
+
 resolvers += Resolver.jcenterRepo
+
+resolvers += Resolver.bintrayRepo("insign", "play-cms")
 
 libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette" % versions.silhouette,
   "com.mohiva" %% "play-silhouette-password-bcrypt" % versions.silhouette,
   "com.mohiva" %% "play-silhouette-persistence" % versions.silhouette,
   "com.mohiva" %% "play-silhouette-crypto-jca" % versions.silhouette,
+  "com.typesafe.akka" % "akka-actor_2.11" % versions.akka,
   "com.typesafe.play" %% "play-slick" % versions.playSlick,
   "com.typesafe.play" %% "play-slick-evolutions" % versions.playSlick,
   "com.typesafe.slick" % "slick-hikaricp_2.11" % versions.slick,
   "com.github.tminglei" %% "slick-pg" % versions.slickPostgres,
   "com.github.tminglei" %% "slick-pg_date2" % versions.slickPostgres,
   "org.postgresql" % "postgresql" % versions.psqlJdbc,
+  "com.typesafe.play" %% "play-mailer" % versions.playMailer,
   "org.webjars" %% "webjars-play" % versions.webjars,
   "net.codingwell" %% "scala-guice" % versions.guice,
   "com.iheart" %% "ficus" % versions.ficus,

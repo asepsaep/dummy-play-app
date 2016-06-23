@@ -3,6 +3,7 @@ package models.daos
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import models._
 import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
 import play.api.Logger
@@ -18,11 +19,13 @@ trait AccountDAO {
   def save(account: Account): Future[Account]
   def count: Future[Int]
   def find(username: String): Future[Option[Account]]
+  def findByLoginInfoAlongWithEmail(username: String, email: String): Future[Option[Account]]
   def findByLoginInfo(loginInfo: LoginInfo): Future[Option[Account]]
   def all: Future[Seq[Account]]
   def all(page: Int, pageSize: Int): Future[Seq[Account]]
   def delete(username: String): Future[Unit]
   def updateUsername(oldUsername: String, updatedAccount: Account): Future[Account]
+  def findCredentialsAccount(email: String): Future[Option[Account]]
 }
 
 class AccountDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider) extends AccountDAO with HasDatabaseConfigProvider[JdbcProfile] {
@@ -41,15 +44,23 @@ class AccountDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigPr
     }
 
   override def findByEmail(email: String): Future[Option[Account]] = {
-    findBy(_.email === email)
+    findBy(_.email.toLowerCase === email.toLowerCase)
   }
 
   override def find(username: String): Future[Option[Account]] = {
-    findBy(_.username === username)
+    findBy(_.username.toLowerCase === username.toLowerCase)
+  }
+
+  override def findCredentialsAccount(email: String): Future[Option[Account]] = {
+    findBy(u => u.providerId === CredentialsProvider.ID && u.email === email)
+  }
+
+  override def findByLoginInfoAlongWithEmail(username: String, email: String) = {
+    findBy(u => u.username.toLowerCase === username.toLowerCase || u.email.toLowerCase === email)
   }
 
   override def findByLoginInfo(loginInfo: LoginInfo): Future[Option[Account]] = {
-    findBy(account => account.providerId === loginInfo.providerID && account.providerKey === loginInfo.providerKey)
+    findBy(account => account.providerId === loginInfo.providerID && account.providerKey.toLowerCase === loginInfo.providerKey.toLowerCase)
   }
 
   override def count: Future[Int] = {
@@ -66,16 +77,15 @@ class AccountDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigPr
 
   override def delete(username: String): Future[Unit] = {
     val deletion = for {
-      oAuth2InfoDeletion <- OAuth2Infos.filter(_.accountUsername === username).delete
-      oAuth1InfoDeletion <- OAuth1Infos.filter(_.accountUsername === username).delete
-      passwordInfoDeletion <- PasswordInfos.filter(_.accountUsername === username).delete
-      accountDeletion <- Accounts.filter(_.username === username).delete
+      oAuth2InfoDeletion <- OAuth2Infos.filter(_.accountUsername.toLowerCase === username.toLowerCase).delete
+      oAuth1InfoDeletion <- OAuth1Infos.filter(_.accountUsername.toLowerCase === username.toLowerCase).delete
+      passwordInfoDeletion <- PasswordInfos.filter(_.accountUsername.toLowerCase === username.toLowerCase).delete
+      accountDeletion <- Accounts.filter(_.username.toLowerCase === username.toLowerCase).delete
     } yield (oAuth2InfoDeletion, oAuth1InfoDeletion, passwordInfoDeletion, accountDeletion)
     db.run(deletion).map(_ => {})
   }
 
   override def save(account: Account): Future[Account] = {
-    Logger.info(account.toString)
     val existingUserFuture = find(account.username)
     existingUserFuture.flatMap {
       case None => db.run(

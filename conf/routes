@@ -3,19 +3,30 @@
 # ~~~~
 
 # Home page
-GET         /                                controllers.ApplicationController.index
-GET         /signOut                         controllers.ApplicationController.signOut
-GET         /authenticate/:provider          controllers.SocialAuthController.authenticate(provider)
+GET         /                              controllers.ApplicationController.index
 
-GET         /signUp                          controllers.SignUpController.view
-POST        /signUp                          controllers.SignUpController.submit
+GET         /register                      controllers.SignUpController.view
+POST        /register                      controllers.SignUpController.submit
 
-GET         /signIn                          controllers.SignInController.view
-POST        /signIn                          controllers.SignInController.submit
+GET         /login                         controllers.SignInController.view
+POST        /login                         controllers.SignInController.submit
 
-GET         /confirm                         controllers.SocialAuthController.view
-POST        /confirm                         controllers.SocialAuthController.submit
+GET         /logout                        controllers.ApplicationController.signOut
+GET         /authenticate/:provider        controllers.SocialAuthController.authenticate(provider)
+
+GET         /set-username                  controllers.SocialAuthController.view
+POST        /set-username                  controllers.SocialAuthController.submit
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                    controllers.Assets.at(path="/public", file)
-GET         /webjars/*file                   controllers.WebJarAssets.at(file)
+GET         /assets/*file                  controllers.Assets.at(path="/public", file)
+GET         /webjars/*file                 controllers.WebJarAssets.at(file)
+
+
+GET         /confirm-email                 controllers.SignUpController.emailConfirmation(token: String ?= "", email: String ?= "")
+
+
+GET         /forgot-password               controllers.ResetPasswordController.viewRequestResetPassword
+POST        /forgot-password               controllers.ResetPasswordController.submitRequestResetPassword
+
+GET         /reset-password                controllers.ResetPasswordController.viewResetPassword(token: String ?= "", email: String ?= "")
+POST        /reset-password                controllers.ResetPasswordController.submitResetPassword(token: String ?= "", email: String ?= "")

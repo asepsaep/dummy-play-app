@@ -1,6 +1,6 @@
 package controllers
 
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 
 import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
@@ -36,6 +36,8 @@ import scala.language.postfixOps
  * @param clock The clock instance.
  * @param webJarAssets The webjar assets implementation.
  */
+
+@Singleton
 class SignInController @Inject() (
   val messagesApi:           MessagesApi,
   silhouette:                Silhouette[DefaultEnv],

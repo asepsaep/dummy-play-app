@@ -1,9 +1,13 @@
+site = http://localhost:9000
+
 error.email = Valid email required
 error.required = This field is required
 invalid.credentials = Invalid credentials!
 access.denied = Access denied!
-user.exists = There already exists a user with this username!
+user.exists = There already exists a user with this username or email!
 could.not.authenticate = Could not authenticate with social provider! Please try again!
+
+email.from = System-NoReply <it.ascend.07@gmail.com>
 
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Sign Up
@@ -27,6 +31,7 @@ last.name = Last name
 full.name = Full name
 email = Email
 password = Password
+confirm.password = Confirm Password
 sign.up = Sign up
 sign.in = Sign in
 sign.out = Sign out
@@ -44,3 +49,31 @@ twitter = Twitter
 vk = VK
 xing = Xing
 yahoo = Yahoo
+
+error.recaptchaNotReachable = Unable to contact Recaptcha
+error.apiError = Invalid response from Recaptcha
+
+reset.password.title = Reset Password
+reset.password.message = Based on your recent account activity, You have requested to reset your password.
+reset.password.link = If you really want to reset click link below
+reset.password.altlink = Or you can copy paste url below into address bar
+reset.password.addinfo = Those links will be expired after 1 hour
+reset.password.disclaimer = Ignore this email if you didn't made any request
+reset.password.success = Your password has been reset
+reset.password.howto = Enter your new password
+
+email.confirm.title = Email Confirmation
+email.confirm.message = Just one last step to your account to be verified
+email.confirm.link = To confirm registration, click link below
+email.confirm.altlink =  Or you can copy paste url below into address bar
+email.confirm.disclaimer = Ignore this email if you didn't register at our site
+email.confirm.success = Your account has been verified
+
+req.reset.password.message = Enter your email
+req.reset.password.submit = Submit
+
+request.reset.password.info = Link to reset your password has been sent to your email
+request.reset.password.status = Your password has been reset. You can now login with your new password
+request.reset.password.noemail = No such email found
+request.reset.password.nomatch = Password do not match
+request.reset.password.expire = Token has expired

@@ -1,6 +1,6 @@
 package controllers
 
-import javax.inject.Inject
+import javax.inject.{ Inject, Singleton }
 
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
@@ -9,10 +9,10 @@ import com.mohiva.play.silhouette.impl.providers._
 import forms.UsernameConfirmationForm
 import models.daos.AccountDAO
 import models.services.AccountService
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{Action, Controller}
-import utils.auth.{DefaultEnv, WithActiveAccount, WithProvider}
+import play.api.mvc.{ Action, Controller }
+import utils.auth.{ DefaultEnv, WithActiveAccount, WithProvider }
 
 import scala.concurrent.Future
 
@@ -27,6 +27,8 @@ import scala.concurrent.Future
  * @param socialProviderRegistry The social provider registry.
  * @param webJarAssets The webjar assets implementation.
  */
+
+@Singleton
 class SocialAuthController @Inject() (
   val messagesApi:           MessagesApi,
   silhouette:                Silhouette[DefaultEnv],
@@ -68,11 +70,11 @@ class SocialAuthController @Inject() (
     }
   }
 
-  def view = silhouette.SecuredAction(WithProvider("credentials") && !WithActiveAccount()).async { implicit request =>
+  def view = silhouette.SecuredAction(WithProvider(CredentialsProvider.ID) && !WithActiveAccount()).async { implicit request =>
     Future.successful(Ok(views.html.usernameConfirmation(UsernameConfirmationForm.form)))
   }
 
-  def submit = silhouette.SecuredAction.async { implicit request =>
+  def submit = silhouette.SecuredAction(WithProvider(CredentialsProvider.ID) && !WithActiveAccount()).async { implicit request =>
     UsernameConfirmationForm.form.bindFromRequest.fold(
       form => Future.successful(BadRequest(views.html.usernameConfirmation(form))),
       data => {

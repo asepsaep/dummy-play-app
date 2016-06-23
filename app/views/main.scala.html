@@ -1,4 +1,4 @@
-@(title: String, account: Option[models.Account] = None)(content: Html)(implicit messages: Messages, webJarAssets: WebJarAssets)
+@(title: String, account: Option[models.Account] = None)(content: Html)(implicit request: Request[AnyContent], messages: Messages, webJarAssets: WebJarAssets)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +36,7 @@
                         <li><a href="@routes.ApplicationController.index">@Messages("home")</a></li>
                         <li><a href="https://github.com/mohiva/play-silhouette-seed">GitHub</a></li>
                     </ul>
+
                     <ul class="nav navbar-nav navbar-right">
                         @account.map { u =>
                             <li><a href="@routes.ApplicationController.index">@u.name</a></li>
@@ -50,6 +51,21 @@
         </header>
         <main class="container">
             <div class="starter-template row">
+
+                @request.flash.get("email.confirm").map { msg =>
+                <div class="col-md-6 col-md-offset-3">
+                    <a href="#" class="close" data-dismiss="alert">&times;</a>
+                    <strong>@msg</strong>
+                </div>
+                }
+
+                @request.flash.get("reset.password").map { msg =>
+                <div class="col-md-6 col-md-offset-3">
+                    <a href="#" class="close" data-dismiss="alert">&times;</a>
+                    <strong>@msg</strong> @Messages("reset.password.success")
+                </div>
+                }
+
                 @content
             </div>
         </main>
