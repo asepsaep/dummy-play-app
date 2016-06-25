@@ -1,15 +1,14 @@
+import sbt.Project.projectToRef
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform._
-
 import scalariform.formatter.preferences._
 
-name := "dev-play-app"
-
-version := "4.0.0-RC1"
-
-scalaVersion := "2.11.8"
+lazy val appV = "0.0.1"
+lazy val scalaV = "2.11.8"
+lazy val clients = Seq(client)
 
 lazy val versions = new {
+
   val silhouette = "4.0.0-RC1"
   val guice = "4.0.1"
   val akka = "2.4.7"
@@ -22,41 +21,100 @@ lazy val versions = new {
   val webjars = "2.5.0-2"
   val playBootstrap = "1.0-P25-B3"
   val scalatest = "2.2.6"
+  val playScalaJS = "0.5.0"
+
+  val dom = "0.9.0"
+  val jquery = "0.9.0"
+
 }
 
-fork in run := true
-
-resolvers += Resolver.jcenterRepo
-
-resolvers += Resolver.bintrayRepo("insign", "play-cms")
-
-libraryDependencies ++= Seq(
-  "com.mohiva" %% "play-silhouette" % versions.silhouette,
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % versions.silhouette,
-  "com.mohiva" %% "play-silhouette-persistence" % versions.silhouette,
-  "com.mohiva" %% "play-silhouette-crypto-jca" % versions.silhouette,
-  "com.typesafe.akka" % "akka-actor_2.11" % versions.akka,
-  "com.typesafe.play" %% "play-slick" % versions.playSlick,
-  "com.typesafe.play" %% "play-slick-evolutions" % versions.playSlick,
-  "com.typesafe.slick" % "slick-hikaricp_2.11" % versions.slick,
-  "com.github.tminglei" %% "slick-pg" % versions.slickPostgres,
-  "com.github.tminglei" %% "slick-pg_date2" % versions.slickPostgres,
-  "org.postgresql" % "postgresql" % versions.psqlJdbc,
-  "com.typesafe.play" %% "play-mailer" % versions.playMailer,
-  "org.webjars" %% "webjars-play" % versions.webjars,
-  "net.codingwell" %% "scala-guice" % versions.guice,
-  "com.iheart" %% "ficus" % versions.ficus,
-  "com.adrianhurt" %% "play-bootstrap" % versions.playBootstrap,
-  "com.mohiva" %% "play-silhouette-testkit" % versions.silhouette % "test",
-  "org.scalatest" %% "scalatest" % versions.scalatest % "test",
-  specs2 % Test,
-  cache,
-  filters
+lazy val commonSettings = Seq(
+  version := appV,
+  scalaVersion := scalaV,
+  resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  resolvers += Resolver.jcenterRepo,
+  resolvers += Resolver.bintrayRepo("insign", "play-cms"),
+  ScalariformKeys.preferences := ScalariformKeys.preferences.value
+    .setPreference(FormatXml, false)
+    .setPreference(DoubleIndentClassDeclaration, false)
+    .setPreference(DanglingCloseParenthesis, Preserve)
+    .setPreference(AlignParameters, false)
+    .setPreference(CompactStringConcatenation, false)
+    .setPreference(IndentPackageBlocks, true)
+    .setPreference(PreserveSpaceBeforeArguments, false)
+    .setPreference(RewriteArrowSymbols, true)
+    .setPreference(AlignSingleLineCaseStatements, true)
+    .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 40)
+    .setPreference(SpaceBeforeColon, false)
+    .setPreference(SpaceInsideBrackets, false)
+    .setPreference(SpaceInsideParentheses, false)
+    .setPreference(PreserveDanglingCloseParenthesis, false)
+    .setPreference(IndentSpaces, 2)
+    .setPreference(IndentLocalDefs, false)
+    .setPreference(SpacesWithinPatternBinders, true)
+    .setPreference(SpacesAroundMultiImports, true)
 )
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala).disablePlugins(SbtScalariform)
+lazy val server = (project in file("server"))
+  .settings(SbtScalariform.defaultScalariformSettings: _*)
+  .settings(commonSettings: _*)
+  .settings(
+    name := "server",
+    fork in run := true,
+    routesGenerator := InjectedRoutesGenerator,
+    scalaJSProjects := clients,
+    pipelineStages := Seq(scalaJSProd, gzip),
+    libraryDependencies ++= Seq(
+      "com.mohiva" %% "play-silhouette" % versions.silhouette,
+      "com.mohiva" %% "play-silhouette-password-bcrypt" % versions.silhouette,
+      "com.mohiva" %% "play-silhouette-persistence" % versions.silhouette,
+      "com.mohiva" %% "play-silhouette-crypto-jca" % versions.silhouette,
+      "com.typesafe.akka" % "akka-actor_2.11" % versions.akka,
+      "com.typesafe.play" %% "play-slick" % versions.playSlick,
+      "com.typesafe.play" %% "play-slick-evolutions" % versions.playSlick,
+      "com.typesafe.slick" % "slick-hikaricp_2.11" % versions.slick,
+      "com.github.tminglei" %% "slick-pg" % versions.slickPostgres,
+      "com.github.tminglei" %% "slick-pg_date2" % versions.slickPostgres,
+      "org.postgresql" % "postgresql" % versions.psqlJdbc,
+      "com.typesafe.play" %% "play-mailer" % versions.playMailer,
+      "org.webjars" %% "webjars-play" % versions.webjars,
+      "net.codingwell" %% "scala-guice" % versions.guice,
+      "com.iheart" %% "ficus" % versions.ficus,
+      "com.adrianhurt" %% "play-bootstrap" % versions.playBootstrap,
+      "com.vmunier" %% "play-scalajs-scripts" % versions.playScalaJS,
+      "com.mohiva" %% "play-silhouette-testkit" % versions.silhouette % "test",
+      "org.scalatest" %% "scalatest" % versions.scalatest % "test",
+      cache,
+      filters,
+      specs2 % Test
+    )
+  ).enablePlugins(PlayScala)
+    .disablePlugins(SbtScalariform)
+    .aggregate(clients.map(projectToRef): _*)
+    .dependsOn(sharedJvm)
 
-routesGenerator := InjectedRoutesGenerator
+
+lazy val client = (project in file("client"))
+  .settings(SbtScalariform.defaultScalariformSettings: _*)
+  .settings(commonSettings: _*).settings(
+    name := "client",
+    scalaJSUseRhino in Global := false,
+    persistLauncher := true,
+    persistLauncher in Test := false,
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % versions.dom,
+      "be.doeraene" %%% "scalajs-jquery" % versions.jquery
+    )
+  ).enablePlugins(ScalaJSPlugin, ScalaJSPlay)
+    .disablePlugins(SbtScalariform)
+    .dependsOn(sharedJs)
+
+lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared"))
+  .settings(scalaVersion := scalaV)
+  .jsConfigure(_ enablePlugins ScalaJSPlay)
+
+lazy val sharedJvm = shared.jvm
+lazy val sharedJs = shared.js
 
 scalacOptions ++= Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
@@ -71,28 +129,4 @@ scalacOptions ++= Seq(
   "-Ywarn-numeric-widen" // Warn when numerics are widened.
 )
 
-//********************************************************
-// Scalariform settings
-//********************************************************
-
-SbtScalariform.defaultScalariformSettings
-
-ScalariformKeys.preferences := ScalariformKeys.preferences.value
-  .setPreference(FormatXml, false)
-  .setPreference(DoubleIndentClassDeclaration, false)
-  .setPreference(DanglingCloseParenthesis, Preserve)
-  .setPreference(AlignParameters, true)
-  .setPreference(CompactStringConcatenation, false)
-  .setPreference(IndentPackageBlocks, true)
-  .setPreference(PreserveSpaceBeforeArguments, false)
-  .setPreference(RewriteArrowSymbols, false)
-  .setPreference(AlignSingleLineCaseStatements, true)
-  .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 40)
-  .setPreference(SpaceBeforeColon, false)
-  .setPreference(SpaceInsideBrackets, false)
-  .setPreference(SpaceInsideParentheses, false)
-  .setPreference(PreserveDanglingCloseParenthesis, false)
-  .setPreference(IndentSpaces, 2)
-  .setPreference(IndentLocalDefs, false)
-  .setPreference(SpacesWithinPatternBinders, true)
-  .setPreference(SpacesAroundMultiImports, true)
+// onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
