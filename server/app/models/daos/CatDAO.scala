@@ -1,8 +1,8 @@
 package models.daos
 
 import scala.concurrent.Future
-
 import javax.inject.Inject
+
 import models.Cat
 import models.CatTypes._
 import play.api.db.slick.DatabaseConfigProvider
@@ -16,7 +16,9 @@ class CatDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider) 
 
   private val Cats = TableQuery[CatsTable]
 
-  def all(): Future[Seq[Cat]] = db.run(Cats.result)
+  def all(): Future[Seq[Cat]] = {
+    db.run(Cats.result)
+  }
 
   def insert(): Future[Unit] = db.run {
     Cats ++= Seq(Cat(10, List("Bacok", "Clurit", "Silet"), Garong), Cat(1, List("Kucing", "Meow", "Empus"), Anggora))

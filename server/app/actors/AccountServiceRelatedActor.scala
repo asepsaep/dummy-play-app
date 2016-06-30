@@ -2,17 +2,18 @@ package actors
 
 import javax.inject.Inject
 
-import akka.actor.Actor.Receive
 import akka.actor._
-import com.mohiva.play.silhouette.api.{ Logger, LoginInfo }
+import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.PasswordHasher
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import events._
-import models.{ Account, TokenInfo }
+import models.TokenInfo
 import models.daos.TokenInfoDAO
 import models.services.AccountService
 import utils.EmailSender
+
+import scala.concurrent.Future
 
 object AccountServiceRelatedActor {
   def props = Props[AccountServiceRelatedActor]

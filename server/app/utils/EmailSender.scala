@@ -1,12 +1,13 @@
 package utils
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import models.{ Account, TokenInfo }
 import models.daos.TokenInfoDAO
 import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.mailer._
 
+@Singleton
 class EmailSender @Inject() (
   mailerClient: MailerClient,
   val messagesApi: MessagesApi

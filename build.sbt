@@ -1,3 +1,5 @@
+import sbt._
+import Keys._
 import sbt.Project.projectToRef
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform._
@@ -17,11 +19,12 @@ lazy val versions = new {
   val psqlJdbc = "9.4-1206-jdbc41"
   val slickPostgres = "0.14.1"
   val playMailer = "5.0.0-M1"
+  val playRecaptcha = "2.0"
   val ficus = "1.2.6"
   val webjars = "2.5.0-2"
   val playBootstrap = "1.0-P25-B3"
-  val scalatest = "2.2.6"
   val playScalaJS = "0.5.0"
+  val playScalatest = "1.5.1"
 
   val dom = "0.9.0"
   val jquery = "0.9.0"
@@ -33,7 +36,6 @@ lazy val commonSettings = Seq(
   scalaVersion := scalaV,
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
   resolvers += Resolver.jcenterRepo,
-  resolvers += Resolver.bintrayRepo("insign", "play-cms"),
   ScalariformKeys.preferences := ScalariformKeys.preferences.value
     .setPreference(FormatXml, false)
     .setPreference(DoubleIndentClassDeclaration, false)
@@ -48,7 +50,6 @@ lazy val commonSettings = Seq(
     .setPreference(SpaceBeforeColon, false)
     .setPreference(SpaceInsideBrackets, false)
     .setPreference(SpaceInsideParentheses, false)
-    .setPreference(PreserveDanglingCloseParenthesis, false)
     .setPreference(IndentSpaces, 2)
     .setPreference(IndentLocalDefs, false)
     .setPreference(SpacesWithinPatternBinders, true)
@@ -61,6 +62,7 @@ lazy val server = (project in file("server"))
   .settings(
     name := "server",
     fork in run := true,
+    connectInput in run := true,
     routesGenerator := InjectedRoutesGenerator,
     scalaJSProjects := clients,
     pipelineStages := Seq(scalaJSProd, gzip),
@@ -77,16 +79,16 @@ lazy val server = (project in file("server"))
       "com.github.tminglei" %% "slick-pg_date2" % versions.slickPostgres,
       "org.postgresql" % "postgresql" % versions.psqlJdbc,
       "com.typesafe.play" %% "play-mailer" % versions.playMailer,
+      "com.nappin" %% "play-recaptcha" % versions.playRecaptcha,
       "org.webjars" %% "webjars-play" % versions.webjars,
       "net.codingwell" %% "scala-guice" % versions.guice,
       "com.iheart" %% "ficus" % versions.ficus,
       "com.adrianhurt" %% "play-bootstrap" % versions.playBootstrap,
       "com.vmunier" %% "play-scalajs-scripts" % versions.playScalaJS,
       "com.mohiva" %% "play-silhouette-testkit" % versions.silhouette % "test",
-      "org.scalatest" %% "scalatest" % versions.scalatest % "test",
+      "org.scalatestplus.play" %% "scalatestplus-play" % versions.playScalatest % "test",
       cache,
-      filters,
-      specs2 % Test
+      filters
     )
   ).enablePlugins(PlayScala)
     .disablePlugins(SbtScalariform)

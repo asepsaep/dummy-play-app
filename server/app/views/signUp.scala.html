@@ -1,7 +1,15 @@
 @import play.api.Environment
 @import com.nappin.play.recaptcha.WidgetHelper
+@import utils.AppMode
 
-@(signUpForm: Form[forms.SignUpForm.Data])(implicit request: Request[AnyContent], messages: Messages, webJarAssets: WebJarAssets, widgetHelper: WidgetHelper, environment: Environment)
+@(signUpForm: Form[forms.SignUpForm.Data])(
+        implicit request: Request[AnyContent],
+        messages: Messages,
+        webJarAssets: WebJarAssets,
+        widgetHelper: WidgetHelper,
+        environment: Environment,
+        appMode: AppMode
+    )
 
 @import b3.inline.fieldConstructor
 
@@ -20,7 +28,7 @@
             @b3.text(signUpForm("name"), '_hiddenLabel -> Messages("name"), 'placeholder -> Messages("name"), 'class -> "form-control input-lg")
             @b3.email(signUpForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
             @b3.password(signUpForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
-            @recaptcha.recaptchaField(form = signUpForm, fieldName = "", includeNoScript = false, isRequired = false)
+            @if(appMode.isProd) { @recaptcha.recaptchaField(form = signUpForm, fieldName = "", includeNoScript = false, isRequired = false) }
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@Messages("sign.up")</button>

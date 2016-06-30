@@ -30,7 +30,7 @@
     <logger name="play" level="INFO" />
     <logger name="application" level="INFO" />
 
-    <!-- Set logging for all Akka library classes to INFO -->
+    <!-- Set logging for all Akka library classes to DEBUG -->
     <logger name="akka" level="DEBUG" />
     <!-- Set a specific actor to DEBUG -->
     <logger name="actors.MyActor" level="DEBUG" />

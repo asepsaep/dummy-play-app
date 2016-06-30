@@ -1,7 +1,17 @@
 @import play.api.Environment
 @import b3.inline.fieldConstructor
+@import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
+@import com.nappin.play.recaptcha.WidgetHelper
+@import utils.AppMode
 
-@(signInForm: Form[forms.SignInForm.Data], socialProviders: com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry)(implicit request: Request[AnyContent], messages: Messages, webJarAssets: WebJarAssets, environment: Environment)
+@(signInForm: Form[forms.SignInForm.Data], socialProviders: SocialProviderRegistry)(
+        implicit request: Request[AnyContent],
+        messages: Messages,
+        webJarAssets: WebJarAssets,
+        environment: Environment,
+        widgetHelper: WidgetHelper,
+        appMode: AppMode
+)
 
 @main(Messages("sign.in.title")) {
 
@@ -33,6 +43,7 @@
             @b3.text(signInForm("username"), '_hiddenLabel -> Messages("username"), 'placeholder -> Messages("username"), 'class -> "form-control input-lg")
             @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
             @b3.checkbox(signInForm("rememberMe"), '_text -> Messages("remember.me"), 'checked -> true)
+            @if(appMode.isProd) { @recaptcha.recaptchaField(form = signInForm, fieldName = "", includeNoScript = false, isRequired = false) }
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@Messages("sign.in")</button>
@@ -48,7 +59,7 @@
             <div class="social-providers">
                 <p>@Messages("or.use.social")</p>
                 <div>
-                @for(p <- socialProviders.providers if p.id != "clef") {
+                @for(p <- socialProviders.providers) {
                     <a href="@routes.SocialAuthController.authenticate(p.id)" class="provider @p.id" title="@Messages(p.id)"><img src="@routes.Assets.at(s"images/providers/${p.id}.png")" width="64px" height="64px" alt="@Messages(p.id)"></a>
                 }
                 </div>
