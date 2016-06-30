@@ -1,6 +1,9 @@
 logs
 project/project
 project/target
+client/target
+server/target
+server/logs
 target
 tmp
 .history
