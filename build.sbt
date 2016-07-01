@@ -12,7 +12,7 @@ lazy val clients = Seq(client)
 lazy val versions = new {
 
   val silhouette = "4.0.0-RC1"
-  val guice = "4.0.1"
+  val spark = "1.6.1"
   val akka = "2.4.7"
   val slick = "3.1.1"
   val playSlick = "2.0.0"
@@ -20,6 +20,7 @@ lazy val versions = new {
   val slickPostgres = "0.14.1"
   val playMailer = "5.0.0-M1"
   val playRecaptcha = "2.0"
+  val guice = "4.0.1"
   val ficus = "1.2.6"
   val webjars = "2.5.0-2"
   val playBootstrap = "1.0-P25-B3"
@@ -71,6 +72,11 @@ lazy val server = (project in file("server"))
       "com.mohiva" %% "play-silhouette-password-bcrypt" % versions.silhouette,
       "com.mohiva" %% "play-silhouette-persistence" % versions.silhouette,
       "com.mohiva" %% "play-silhouette-crypto-jca" % versions.silhouette,
+      "org.apache.spark" %% "spark-core" % versions.spark,
+      "org.apache.spark" %% "spark-sql" % versions.spark,
+      "org.apache.spark" %% "spark-mllib" % versions.spark,
+      "org.apache.spark" %% "spark-streaming" % versions.spark,
+      "org.apache.spark" %% "spark-streaming-twitter" % versions.spark,
       "com.typesafe.akka" % "akka-actor_2.11" % versions.akka,
       "com.typesafe.play" %% "play-slick" % versions.playSlick,
       "com.typesafe.play" %% "play-slick-evolutions" % versions.playSlick,

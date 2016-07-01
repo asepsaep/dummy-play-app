@@ -1,8 +1,8 @@
 package utils
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 
-import play.api.{Environment, Mode}
+import play.api.{ Environment, Mode }
 
 @Singleton
 class AppMode @Inject() (environment: Environment) {

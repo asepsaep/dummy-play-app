@@ -2,7 +2,7 @@
 @import com.nappin.play.recaptcha.WidgetHelper
 @import utils.AppMode
 
-@(signUpForm: Form[forms.SignUpForm.Data])(
+@(registerForm: Form[forms.RegisterForm.Data])(
         implicit request: Request[AnyContent],
         messages: Messages,
         webJarAssets: WebJarAssets,
@@ -22,20 +22,20 @@
     }
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>@Messages("sign.up.account")</legend>
-        @helper.form(action = routes.SignUpController.submit()) {
+        @helper.form(action = routes.RegisterController.submit()) {
             @helper.CSRF.formField
-            @b3.text(signUpForm("username"), '_hiddenLabel -> Messages("username"), 'placeholder -> Messages("username"), 'class -> "form-control input-lg")
-            @b3.text(signUpForm("name"), '_hiddenLabel -> Messages("name"), 'placeholder -> Messages("name"), 'class -> "form-control input-lg")
-            @b3.email(signUpForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
-            @b3.password(signUpForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
-            @if(appMode.isProd) { @recaptcha.recaptchaField(form = signUpForm, fieldName = "", includeNoScript = false, isRequired = false) }
+            @b3.text(registerForm("username"), '_hiddenLabel -> Messages("username"), 'placeholder -> Messages("username"), 'class -> "form-control input-lg")
+            @b3.text(registerForm("name"), '_hiddenLabel -> Messages("name"), 'placeholder -> Messages("name"), 'class -> "form-control input-lg")
+            @b3.email(registerForm("email"), '_hiddenLabel -> Messages("email"), 'placeholder -> Messages("email"), 'class -> "form-control input-lg")
+            @b3.password(registerForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
+            @if(appMode.isProd) { @recaptcha.recaptchaField(form = registerForm, fieldName = "", includeNoScript = false, isRequired = false) }
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@Messages("sign.up")</button>
                 </div>
             </div>
             <div class="sign-in-now">
-                <p>@Messages("already.a.member") <a href="@routes.SignInController.view">@Messages("sign.in.now")</a></p>
+                <p>@Messages("already.a.member") <a href="@routes.LoginController.view">@Messages("sign.in.now")</a></p>
             </div>
         }
     </fieldset>

@@ -5,11 +5,11 @@
 # Home page
 GET         /                              controllers.ApplicationController.index
 
-GET         /register                      controllers.SignUpController.view
-POST        /register                      controllers.SignUpController.submit
+GET         /register                      controllers.RegisterController.view
+POST        /register                      controllers.RegisterController.submit
 
-GET         /login                         controllers.SignInController.view
-POST        /login                         controllers.SignInController.submit
+GET         /login                         controllers.LoginController.view
+POST        /login                         controllers.LoginController.submit
 
 POST        /logout                        controllers.ApplicationController.logout
 
@@ -23,11 +23,16 @@ GET         /assets/*file                  controllers.Assets.at(path="/public",
 GET         /webjars/*file                 controllers.WebJarAssets.at(file)
 
 
-GET         /confirm-email                 controllers.SignUpController.emailConfirmation(token: String ?= "", email: String ?= "")
+GET         /confirm-email                 controllers.RegisterController.emailConfirmation(token: String ?= "", email: String ?= "")
 
 
-GET         /forgot-password               controllers.ResetPasswordController.viewRequestResetPassword
-POST        /forgot-password               controllers.ResetPasswordController.submitRequestResetPassword
+GET         /forgot-password               controllers.ResetPasswordController.viewForgotPassword
+POST        /forgot-password               controllers.ResetPasswordController.submitForgotPassword
 
 GET         /reset-password                controllers.ResetPasswordController.viewResetPassword(token: String ?= "", email: String ?= "")
 POST        /reset-password                controllers.ResetPasswordController.submitResetPassword(token: String ?= "", email: String ?= "")
+
+GET         /ticket                        controllers.TicketController.view
+POST        /ticket                        controllers.TicketController.submit
+
+GET         /ticket/:uuid                  controllers.TicketController.detail(uuid: String)

@@ -17,18 +17,6 @@ import utils.auth.{ DefaultEnv, WithActiveAccount, WithProvider }
 
 import scala.concurrent.Future
 
-/**
- * The social auth controller.
- *
- * @param messagesApi The Play messages API.
- * @param silhouette The Silhouette stack.
- * @param accountService The account service implementation.
- * @param accountDao The account dao implementation.
- * @param authInfoRepository The auth info service implementation.
- * @param socialProviderRegistry The social provider registry.
- * @param webJarAssets The webjar assets implementation.
- */
-
 @Singleton
 class SocialAuthController @Inject() (
   val messagesApi: MessagesApi,
@@ -42,12 +30,6 @@ class SocialAuthController @Inject() (
 )
   extends Controller with I18nSupport with Logger {
 
-  /**
-   * Authenticates a user against a social provider.
-   *
-   * @param provider The ID of the provider to authenticate against.
-   * @return The result to display.
-   */
   def authenticate(provider: String) = Action.async { implicit request ⇒
     (socialProviderRegistry.get[SocialProvider](provider) match {
       case Some(p: SocialProvider with CommonSocialProfileBuilder) ⇒
@@ -68,7 +50,7 @@ class SocialAuthController @Inject() (
     }).recover {
       case e: ProviderException ⇒
         logger.error("Unexpected provider error", e)
-        Redirect(routes.SignInController.view()).flashing("error" → Messages("could.not.authenticate"))
+        Redirect(routes.LoginController.view()).flashing("error" → Messages("could.not.authenticate"))
     }
   }
 

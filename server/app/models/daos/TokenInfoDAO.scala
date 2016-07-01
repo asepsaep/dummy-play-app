@@ -2,8 +2,8 @@ package models.daos
 
 import javax.inject.Inject
 
-import models.{TokenInfo, TokenInfoTable}
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import models.{ TokenInfo, TokenInfoTable }
+import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
 import slick.driver.JdbcProfile
 import slick.lifted.TableQuery
 import modules.MyPostgresDriver.api._

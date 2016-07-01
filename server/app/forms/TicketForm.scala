@@ -3,20 +3,18 @@ package forms
 import play.api.data.Form
 import play.api.data.Forms._
 
-object RequestResetPassword {
+object TicketForm {
+
   val form = Form(
     mapping(
-      "email" → email
+      "title" -> nonEmptyText,
+      "description" -> nonEmptyText
     )(Data.apply)(Data.unapply)
   )
 
-  /**
-   * The form data.
-   *
-   * @param email email
-   */
   case class Data(
-    email: String
+    title: String,
+    description: String
   )
 
 }

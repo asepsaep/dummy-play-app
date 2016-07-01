@@ -3,16 +3,20 @@ package forms
 import play.api.data.Form
 import play.api.data.Forms._
 
-object UsernameConfirmationForm {
-
+object ForgotPassword {
   val form = Form(
     mapping(
-      "username" → nonEmptyText(minLength = 4, maxLength = 30)
+      "email" → email
     )(Data.apply)(Data.unapply)
   )
 
+  /**
+   * The form data.
+   *
+   * @param email email
+   */
   case class Data(
-    username: String
+    email: String
   )
 
 }

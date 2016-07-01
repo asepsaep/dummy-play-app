@@ -31,7 +31,7 @@ class ApplicationControllerSpec extends PlaySpecification with Mockito {
         status(redirectResult) must be equalTo SEE_OTHER
 
         val redirectURL = redirectLocation(redirectResult).getOrElse("")
-        redirectURL must contain(routes.SignInController.view().toString)
+        redirectURL must contain(routes.LoginController.view().toString)
 
         val Some(unauthorizedResult) = route(app, FakeRequest(GET, redirectURL))
 

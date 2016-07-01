@@ -45,6 +45,8 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]
     bind[AccountDAO].to[AccountDAOImpl]
     bind[TokenInfoDAO].to[TokenInfoDAOImpl]
+    bind[TicketDAO].to[TicketDAOImpl]
+    bind[MilestoneDAO].to[MilestoneDAOImpl]
     bind[AccountService].to[AccountServiceImpl]
     bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
     bind[DelegableAuthInfoDAO[OAuth1Info]].to[OAuth1InfoDAO]

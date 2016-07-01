@@ -77,3 +77,8 @@ request.reset.password.status = Your password has been reset. You can now login 
 request.reset.password.noemail = No such email found
 request.reset.password.nomatch = Password do not match
 request.reset.password.expire = Token has expired
+
+ticket.tagline = Create New Ticket
+ticket.title = Title
+ticket.description = Description
+ticket.submit = Submit

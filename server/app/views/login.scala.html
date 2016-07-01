@@ -4,7 +4,7 @@
 @import com.nappin.play.recaptcha.WidgetHelper
 @import utils.AppMode
 
-@(signInForm: Form[forms.SignInForm.Data], socialProviders: SocialProviderRegistry)(
+@(loginForm: Form[forms.LoginForm.Data], socialProviders: SocialProviderRegistry)(
         implicit request: Request[AnyContent],
         messages: Messages,
         webJarAssets: WebJarAssets,
@@ -38,12 +38,12 @@
 
     <fieldset class="col-md-6 col-md-offset-3">
         <legend>@Messages("sign.in.credentials")</legend>
-        @helper.form(action = routes.SignInController.submit()) {
+        @helper.form(action = routes.LoginController.submit()) {
             @helper.CSRF.formField
-            @b3.text(signInForm("username"), '_hiddenLabel -> Messages("username"), 'placeholder -> Messages("username"), 'class -> "form-control input-lg")
-            @b3.password(signInForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
-            @b3.checkbox(signInForm("rememberMe"), '_text -> Messages("remember.me"), 'checked -> true)
-            @if(appMode.isProd) { @recaptcha.recaptchaField(form = signInForm, fieldName = "", includeNoScript = false, isRequired = false) }
+            @b3.text(loginForm("username"), '_hiddenLabel -> Messages("username"), 'placeholder -> Messages("username"), 'class -> "form-control input-lg")
+            @b3.password(loginForm("password"), '_hiddenLabel -> Messages("password"), 'placeholder -> Messages("password"), 'class -> "form-control input-lg")
+            @b3.checkbox(loginForm("rememberMe"), '_text -> Messages("remember.me"), 'checked -> true)
+            @if(appMode.isProd) { @recaptcha.recaptchaField(form = loginForm, fieldName = "", includeNoScript = false, isRequired = false) }
             <div class="form-group">
                 <div>
                     <button id="submit" type="submit" value="submit" class="btn btn-lg btn-primary btn-block">@Messages("sign.in")</button>
@@ -52,7 +52,7 @@
         }
 
         <div>
-            <p class="not-a-member">@Messages("not.a.member") <a href="@routes.SignUpController.view">@Messages("sign.up.now")</a></p>
+            <p class="not-a-member">@Messages("not.a.member") <a href="@routes.RegisterController.view">@Messages("sign.up.now")</a></p>
         </div>
 
         @if(socialProviders.providers.nonEmpty) {

@@ -42,7 +42,7 @@ class AccountServiceRelatedActor @Inject() (
       tokenInfoDAO.delete(tokenInfo.token)
     }
 
-    case event @ RequestResetPasswordEvent(account) ⇒ {
+    case event @ ForgotPasswordEvent(account) ⇒ {
       val tokenInfo: TokenInfo = TokenInfo(email = account.email.get, accountUsername = account.username)
       tokenInfoDAO.save(tokenInfo)
       emailSender.resetPassword(tokenInfo, account)

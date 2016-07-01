@@ -3,18 +3,19 @@ package forms
 import play.api.data.Form
 import play.api.data.Forms._
 
-object ResetPassword {
+object LoginForm {
 
   val form = Form(
     mapping(
-      "password" → nonEmptyText(minLength = 6),
-      "confirmPassword" → nonEmptyText(minLength = 6)
+      "username" → nonEmptyText,
+      "password" → nonEmptyText,
+      "rememberMe" → boolean
     )(Data.apply)(Data.unapply)
   )
 
   case class Data(
+    username: String,
     password: String,
-    confirmPassword: String
+    rememberMe: Boolean
   )
-
 }

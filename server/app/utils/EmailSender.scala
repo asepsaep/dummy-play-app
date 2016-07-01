@@ -1,6 +1,6 @@
 package utils
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 
 import models.{ Account, TokenInfo }
 import models.daos.TokenInfoDAO

@@ -1,21 +1,23 @@
 package controllers
 
 import java.time.OffsetDateTime
-import javax.inject.{ Inject, Named, Singleton }
+import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor._
-import com.mohiva.play.silhouette.api.{ EventBus, Silhouette }
+import com.mohiva.play.silhouette.api.{EventBus, Silhouette}
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.PasswordHasher
-import com.nappin.play.recaptcha.{ RecaptchaVerifier, WidgetHelper }
-import events.{ RequestResetPasswordEvent, ResetPasswordEvent }
-import forms.{ RequestResetPassword, ResetPassword }
+import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
+import events.{ForgotPasswordEvent, ResetPasswordEvent}
+import forms.{ForgotPassword, ResetPassword}
 import models.daos.TokenInfoDAO
 import models.services.AccountService
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.Controller
+import play.api.mvc.{AnyContent, Controller, Request}
 import play.api.Environment
+import play.api.data.Form
+import utils.AppMode
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
@@ -31,32 +33,41 @@ class ResetPasswordController @Inject() (
   eventBus: EventBus,
   @Named("account-service-related-actor") resetPasswordActor: ActorRef,
   val verifier: RecaptchaVerifier,
+  implicit val appMode: AppMode,
   implicit val webJarAssets: WebJarAssets,
   implicit val environment: Environment
 )(implicit widgetHelper: WidgetHelper) extends Controller with I18nSupport {
 
-  eventBus.subscribe(resetPasswordActor, classOf[RequestResetPasswordEvent])
+  eventBus.subscribe(resetPasswordActor, classOf[ForgotPasswordEvent])
   eventBus.subscribe(resetPasswordActor, classOf[ResetPasswordEvent])
 
-  def viewRequestResetPassword = silhouette.UnsecuredAction.async { implicit request ⇒
-    Future.successful(Ok(views.html.requestResetPassword(RequestResetPassword.form)))
+  def viewForgotPassword = silhouette.UnsecuredAction.async { implicit request ⇒
+    Future.successful(Ok(views.html.forgotPassword(ForgotPassword.form)))
   }
 
-  def submitRequestResetPassword = silhouette.UnsecuredAction.async { implicit request ⇒
-    verifier.bindFromRequestAndVerify(RequestResetPassword.form).flatMap { form ⇒
-      form.fold(
-        form ⇒ Future.successful(BadRequest(views.html.requestResetPassword(form))),
-        data ⇒ {
-          accountService.findCredentialsAccount(data.email).flatMap {
-            case None ⇒ Future.successful(Redirect(routes.ResetPasswordController.viewRequestResetPassword()).flashing("error" → Messages("request.reset.password.noemail")))
-            case Some(account) ⇒ {
-              eventBus.publish(RequestResetPasswordEvent(account))
-              Future.successful(Redirect(routes.SignInController.view()).flashing("request.reset.password.info" → Messages("request.reset.password.info")))
-            }
+  def submitForgotPassword = silhouette.UnsecuredAction.async { implicit request =>
+    if (appMode.isProd) {
+      verifier.bindFromRequestAndVerify(ForgotPassword.form).flatMap { form ⇒
+        formFoldHelper(form)
+      }
+    } else {
+      formFoldHelper(ForgotPassword.form.bindFromRequest)
+    }
+  }
+
+  def formFoldHelper(form: Form[ForgotPassword.Data])(implicit request: Request[AnyContent]) = {
+    form.fold(
+      form ⇒ Future.successful(BadRequest(views.html.forgotPassword(form))),
+      data ⇒ {
+        accountService.findCredentialsAccount(data.email).flatMap {
+          case None ⇒ Future.successful(Redirect(routes.ResetPasswordController.viewForgotPassword()).flashing("error" → Messages("request.reset.password.noemail")))
+          case Some(account) ⇒ {
+            eventBus.publish(ForgotPasswordEvent(account))
+            Future.successful(Redirect(routes.LoginController.view()).flashing("request.reset.password.info" → Messages("request.reset.password.info")))
           }
         }
-      )
-    }
+      }
+    )
   }
 
   def viewResetPassword(token: String, email: String) = silhouette.UnsecuredAction.async { implicit request ⇒
@@ -77,11 +88,11 @@ class ResetPasswordController @Inject() (
           case None ⇒ Future.successful(Redirect(routes.ApplicationController.index()))
           case Some(tokenInfo) ⇒ {
             if (tokenInfo.email.toLowerCase != email.toLowerCase) Future.successful(Redirect(routes.ApplicationController.index()))
-            else if (tokenInfo.expiresAt.compareTo(OffsetDateTime.now()) < 0) Future.successful(Redirect(routes.SignInController.view()).flashing("error" → Messages("request.reset.password.expire")))
+            else if (tokenInfo.expiresAt.compareTo(OffsetDateTime.now()) < 0) Future.successful(Redirect(routes.LoginController.view()).flashing("error" → Messages("request.reset.password.expire")))
             else if (data.password != data.confirmPassword) Future.successful(Redirect(routes.ResetPasswordController.viewResetPassword(token, email)).flashing("error" → Messages("request.reset.password.nomatch")))
             else {
               eventBus.publish(ResetPasswordEvent(tokenInfo, data.password))
-              Future.successful(Redirect(routes.SignInController.view()).flashing("reset.password.status" → Messages("request.reset.password.status")))
+              Future.successful(Redirect(routes.LoginController.view()).flashing("reset.password.status" → Messages("request.reset.password.status")))
             }
           }
         }

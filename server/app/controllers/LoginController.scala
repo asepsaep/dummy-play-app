@@ -1,23 +1,23 @@
 package controllers
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{ Inject, Singleton }
 
 import com.mohiva.play.silhouette.api.Authenticator.Implicits._
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.util.{Clock, Credentials}
+import com.mohiva.play.silhouette.api.util.{ Clock, Credentials }
 import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers._
-import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
-import forms.SignInForm
+import com.nappin.play.recaptcha.{ RecaptchaVerifier, WidgetHelper }
+import forms.LoginForm
 import models.services.AccountService
 import net.ceedubs.ficus.Ficus._
 import play.api.Configuration
 import play.api.Logger
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{AnyContent, Controller, Request}
+import play.api.mvc.{ AnyContent, Controller, Request }
 import play.api.Environment
 import play.api.data.Form
 import utils.AppMode
@@ -28,7 +28,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 @Singleton
-class SignInController @Inject() (
+class LoginController @Inject()(
   val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
   accountService: AccountService,
@@ -46,23 +46,22 @@ class SignInController @Inject() (
   extends Controller with I18nSupport {
 
   def view = silhouette.UnsecuredAction.async { implicit request ⇒
-    Future.successful(Ok(views.html.signIn(SignInForm.form, socialProviderRegistry)))
+    Future.successful(Ok(views.html.login(LoginForm.form, socialProviderRegistry)))
   }
 
-  def submit = silhouette.UnsecuredAction.async { implicit request =>
+  def submit = silhouette.UnsecuredAction.async { implicit request ⇒
     if (appMode.isProd) {
-      verifier.bindFromRequestAndVerify(SignInForm.form).flatMap { form =>
+      verifier.bindFromRequestAndVerify(LoginForm.form).flatMap { form ⇒
         formFoldHelper(form)
       }
-    }
-    else {
-      formFoldHelper(SignInForm.form.bindFromRequest)
+    } else {
+      formFoldHelper(LoginForm.form.bindFromRequest)
     }
   }
 
-  def formFoldHelper(form: Form[SignInForm.Data])(implicit request: Request[AnyContent]) = {
+  def formFoldHelper(form: Form[LoginForm.Data])(implicit request: Request[AnyContent]) = {
     form.fold(
-      form ⇒ Future.successful(BadRequest(views.html.signIn(form, socialProviderRegistry))),
+      form ⇒ Future.successful(BadRequest(views.html.login(form, socialProviderRegistry))),
       data ⇒ {
         val credentials = Credentials(data.username, data.password)
         credentialsProvider.authenticate(credentials).flatMap { loginInfo ⇒
@@ -92,7 +91,7 @@ class SignInController @Inject() (
         }.recover {
           case e: ProviderException ⇒
             Logger.error(e.getMessage + " " + e.getCause)
-            Redirect(routes.SignInController.view()).flashing("error" → Messages("invalid.credentials"))
+            Redirect(routes.LoginController.view()).flashing("error" → Messages("invalid.credentials"))
         }
       }
     )

@@ -1,6 +1,7 @@
 package models
 
 import java.time.OffsetDateTime
+import java.util.UUID
 
 import modules.MyPostgresDriver.api._
 
@@ -17,7 +18,18 @@ class AccountTable(tag: Tag) extends Table[Account](tag, "account") {
   def providerId = column[String]("provider_id")
   def providerKey = column[String]("provider_key")
 
-  override def * = (username, name.?, email.?, userType.?, userParent.?, active, avatarUrl.?, createdAt, providerId, providerKey) <> (Account.tupled, Account.unapply _)
+  override def * = (
+    username,
+    name.?,
+    email.?,
+    userType.?,
+    userParent.?,
+    active,
+    avatarUrl.?,
+    createdAt,
+    providerId,
+    providerKey
+  ) <> (Account.tupled, Account.unapply _)
 
 }
 
@@ -51,7 +63,14 @@ class OAuth2InfoTable(tag: Tag) extends Table[DBOAuth2Info](tag, "oauth2_info") 
   def params = column[Map[String, String]]("params")
   def accountUsername = column[String]("account_username")
 
-  override def * = (accessToken, tokenType.?, expiresIn.?, refreshToken.?, params.?, accountUsername) <> ((DBOAuth2Info.apply _).tupled, DBOAuth2Info.unapply _)
+  override def * = (
+    accessToken,
+    tokenType.?,
+    expiresIn.?,
+    refreshToken.?,
+    params.?,
+    accountUsername
+  ) <> ((DBOAuth2Info.apply _).tupled, DBOAuth2Info.unapply _)
 
 }
 
@@ -63,5 +82,61 @@ class TokenInfoTable(tag: Tag) extends Table[TokenInfo](tag, "token_info") {
   def accountUsername = column[String]("account_username")
 
   override def * = (token, email, expiresAt, accountUsername) <> (TokenInfo.tupled, TokenInfo.unapply _)
+
+}
+
+class TicketTable(tag: Tag) extends Table[Ticket](tag, "ticket") {
+
+  def id = column[UUID]("id", O.PrimaryKey)
+  def reporter = column[String]("reporter")
+  def reporterName = column[String]("reporter_name")
+  def assignedTo = column[String]("assigned_to")
+  def assignedToName = column[String]("assigned_to_name")
+  def cc = column[List[String]]("cc")
+  def createdAt = column[OffsetDateTime]("created_at")
+  def status = column[String]("status")
+  def priority = column[String]("priority")
+  def title = column[String]("title")
+  def description = column[String]("description")
+  def resolution = column[String]("resolution")
+  def attachment = column[List[String]]("attachment")
+  def media = column[String]("media")
+
+  override def * = (
+    id.?,
+    reporter.?,
+    reporterName.?,
+    assignedTo.?,
+    assignedToName.?,
+    cc,
+    createdAt,
+    status.?,
+    priority.?,
+    title.?,
+    description.?,
+    resolution.?,
+    attachment,
+    media.?
+  ) <> ((Ticket.apply _).tupled, Ticket.unapply _)
+
+}
+
+class MilestoneTable(tag: Tag) extends Table[Milestone](tag, "milestone") {
+
+  def id = column[UUID]("id")
+  def ticketId = column[UUID]("ticket_id")
+  def datetime = column[OffsetDateTime]("datetime")
+  def description = column[String]("description")
+  def milestoneReporter = column[String]("milestone_reporter")
+  def milestoneReporterName = column[String]("milestone_reporter_name")
+
+  override def * = (
+    id.?,
+    ticketId.?,
+    datetime,
+    description.?,
+    milestoneReporter.?,
+    milestoneReporterName.?
+  ) <> ((Milestone.apply _).tupled, Milestone.unapply _)
 
 }

@@ -51,8 +51,8 @@
                             @*<li><a href="@routes.ApplicationController.signOut">@Messages("sign.out")</a></li>*@
                             <li><a href="javascript:{}" onclick="client.PlayAppJS().logout()">@Messages("sign.out")</a></li>
                         }.getOrElse {
-                            <li><a href="@routes.SignInController.view">@Messages("sign.in")</a></li>
-                            <li><a href="@routes.SignUpController.view">@Messages("sign.up")</a></li>
+                            <li><a href="@routes.LoginController.view">@Messages("sign.in")</a></li>
+                            <li><a href="@routes.RegisterController.view">@Messages("sign.up")</a></li>
                         }
                     </ul>
                 </nav>
