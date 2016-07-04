@@ -1,20 +1,20 @@
 package controllers
 
 import java.time.OffsetDateTime
-import javax.inject.{Inject, Named, Singleton}
+import javax.inject.{ Inject, Named, Singleton }
 
 import akka.actor._
-import com.mohiva.play.silhouette.api.{EventBus, Silhouette}
+import com.mohiva.play.silhouette.api.{ EventBus, Silhouette }
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.PasswordHasher
-import com.nappin.play.recaptcha.{RecaptchaVerifier, WidgetHelper}
-import events.{ForgotPasswordEvent, ResetPasswordEvent}
-import forms.{ForgotPassword, ResetPassword}
+import com.nappin.play.recaptcha.{ RecaptchaVerifier, WidgetHelper }
+import events.{ ForgotPasswordEvent, ResetPasswordEvent }
+import forms.{ ForgotPassword, ResetPassword }
 import models.daos.TokenInfoDAO
 import models.services.AccountService
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{AnyContent, Controller, Request}
+import play.api.mvc.{ AnyContent, Controller, Request }
 import play.api.Environment
 import play.api.data.Form
 import utils.AppMode
@@ -45,7 +45,7 @@ class ResetPasswordController @Inject() (
     Future.successful(Ok(views.html.forgotPassword(ForgotPassword.form)))
   }
 
-  def submitForgotPassword = silhouette.UnsecuredAction.async { implicit request =>
+  def submitForgotPassword = silhouette.UnsecuredAction.async { implicit request ⇒
     if (appMode.isProd) {
       verifier.bindFromRequestAndVerify(ForgotPassword.form).flatMap { form ⇒
         formFoldHelper(form)

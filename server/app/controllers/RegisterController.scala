@@ -25,20 +25,20 @@ import utils.auth.DefaultEnv
 import scala.concurrent.Future
 
 @Singleton
-class RegisterController @Inject()(
-                                    val messagesApi: MessagesApi,
-                                    silhouette: Silhouette[DefaultEnv],
-                                    accountService: AccountService,
-                                    authInfoRepository: AuthInfoRepository,
-                                    avatarService: AvatarService,
-                                    tokenInfoDAO: TokenInfoDAO,
-                                    passwordHasher: PasswordHasher,
-                                    @Named("account-service-related-actor") registerActor: ActorRef,
-                                    eventBus: EventBus,
-                                    val verifier: RecaptchaVerifier,
-                                    implicit val appMode: AppMode,
-                                    implicit val webJarAssets: WebJarAssets,
-                                    implicit val environment: Environment
+class RegisterController @Inject() (
+  val messagesApi: MessagesApi,
+  silhouette: Silhouette[DefaultEnv],
+  accountService: AccountService,
+  authInfoRepository: AuthInfoRepository,
+  avatarService: AvatarService,
+  tokenInfoDAO: TokenInfoDAO,
+  passwordHasher: PasswordHasher,
+  @Named("account-service-related-actor") registerActor: ActorRef,
+  eventBus: EventBus,
+  val verifier: RecaptchaVerifier,
+  implicit val appMode: AppMode,
+  implicit val webJarAssets: WebJarAssets,
+  implicit val environment: Environment
 )(implicit widgetHelper: WidgetHelper)
   extends Controller with I18nSupport {
 

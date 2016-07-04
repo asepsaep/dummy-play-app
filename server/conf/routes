@@ -36,3 +36,7 @@ GET         /ticket                        controllers.TicketController.view
 POST        /ticket                        controllers.TicketController.submit
 
 GET         /ticket/:uuid                  controllers.TicketController.detail(uuid: String)
+
+GET         /classify/:uuid                controllers.ActorController.classify(uuid: String)
+
+GET         /build                         controllers.ActorController.build

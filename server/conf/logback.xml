@@ -33,7 +33,11 @@
     <!-- Set logging for all Akka library classes to DEBUG -->
     <logger name="akka" level="DEBUG" />
     <!-- Set a specific actor to DEBUG -->
-    <logger name="actors.MyActor" level="DEBUG" />
+    <logger name="actors.Director" level="DEBUG" />
+    <logger name="actors.CorpusInitializer" level="DEBUG" />
+    <logger name="actors.BatchTrainer" level="DEBUG" />
+    <logger name="actors.Classifier" level="DEBUG" />
+    <logger name="actors.ClassifierHandler" level="DEBUG" />
 
     <logger name="com.nappin.play.recaptcha" level="DEBUG"/>
 

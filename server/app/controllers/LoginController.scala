@@ -28,7 +28,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 @Singleton
-class LoginController @Inject()(
+class LoginController @Inject() (
   val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
   accountService: AccountService,

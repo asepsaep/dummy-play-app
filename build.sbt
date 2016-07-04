@@ -23,6 +23,7 @@ lazy val versions = new {
   val guice = "4.0.1"
   val ficus = "1.2.6"
   val webjars = "2.5.0-2"
+  val jackson = "2.7.4"
   val playBootstrap = "1.0-P25-B3"
   val playScalaJS = "0.5.0"
   val playScalatest = "1.5.1"
@@ -77,6 +78,8 @@ lazy val server = (project in file("server"))
       "org.apache.spark" %% "spark-mllib" % versions.spark,
       "org.apache.spark" %% "spark-streaming" % versions.spark,
       "org.apache.spark" %% "spark-streaming-twitter" % versions.spark,
+      "com.fasterxml.jackson.core" % "jackson-databind" % versions.jackson,
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.jackson,
       "com.typesafe.akka" % "akka-actor_2.11" % versions.akka,
       "com.typesafe.play" %% "play-slick" % versions.playSlick,
       "com.typesafe.play" %% "play-slick-evolutions" % versions.playSlick,

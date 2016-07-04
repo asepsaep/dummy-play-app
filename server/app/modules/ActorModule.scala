@@ -1,6 +1,6 @@
 package modules
 
-import actors.AccountServiceRelatedActor
+import actors.{ AccountServiceRelatedActor, Director }
 import com.google.inject.AbstractModule
 import play.api.libs.concurrent.AkkaGuiceSupport
 

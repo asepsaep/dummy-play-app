@@ -7,8 +7,8 @@ object TicketForm {
 
   val form = Form(
     mapping(
-      "title" -> nonEmptyText,
-      "description" -> nonEmptyText
+      "title" → nonEmptyText,
+      "description" → nonEmptyText
     )(Data.apply)(Data.unapply)
   )
 
