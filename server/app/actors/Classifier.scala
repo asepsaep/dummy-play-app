@@ -21,7 +21,6 @@ object Classifier {
     Props(new Classifier(sparkContext, batchTrainer, predictor))
 
   case class Classify(ticket: Ticket)
-
   case class ClassificationResult(batchModelResult: Seq[LabeledTicket])
 
 }
@@ -35,14 +34,13 @@ class Classifier(sparkContext: SparkContext, batchTrainer: ActorRef, predictor: 
 
   override def receive: Receive = LoggingReceive {
 
-    case Classify(ticket) ⇒ {
+    case Classify(ticket) ⇒
       log.debug("Classifying.....")
       val originalSender = sender
       log.debug("Create classifier handler")
-      val handler = context.actorOf(ClassifierHandler.props(batchTrainer, originalSender, sparkContext, predictor, ticket), "classifier-handler")
+      val handler = context.actorOf(ClassifierHandler.props(batchTrainer, originalSender, sparkContext, predictor, ticket))
       log.debug("Get latest model from batch trainer")
       batchTrainer.tell(GetLatestModel, handler)
-    }
 
   }
 
@@ -63,22 +61,20 @@ class ClassifierHandler(batchTrainer: ActorRef, originalSender: ActorRef, sparkC
 
   override def receive: Receive = LoggingReceive {
 
-    case BatchTrainerModel(model) ⇒ {
+    case BatchTrainerModel(model) ⇒
       log.debug(s"Received batch trainer model: $model")
       batchTrainerModel = model
-      predict
-    }
+      predict()
 
   }
 
-  def predict = batchTrainerModel match {
+  def predict() = batchTrainerModel match {
 
-    case Some(batchModelTransformer) ⇒ {
+    case Some(batchModelTransformer) ⇒
       log.debug("Calling predictor.predict() ...")
       val batchModelResult = predictor.predict(batchModelTransformer, ticket)
       originalSender ! batchModelResult
       context.stop(self)
-    }
 
     case _ ⇒
 

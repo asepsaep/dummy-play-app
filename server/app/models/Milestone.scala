@@ -1,11 +1,10 @@
 package models
 
 import java.time.OffsetDateTime
-import java.util.UUID
 
 case class Milestone(
-  id: Option[UUID],
-  ticketId: Option[UUID],
+  id: Option[Long],
+  ticketId: Option[Long],
   datetime: OffsetDateTime = OffsetDateTime.now(),
   description: Option[String],
   milestoneReporter: Option[String],

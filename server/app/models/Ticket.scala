@@ -1,11 +1,10 @@
 package models
 
 import java.time.OffsetDateTime
-import java.util.UUID
 import utils.TextCleaning
 
 case class Ticket(
-  id: Option[UUID],
+  id: Option[Long],
   reporter: Option[String],
   reporterName: Option[String],
   assignedTo: Option[String],
@@ -21,20 +20,17 @@ case class Ticket(
   media: Option[String]
 ) extends Serializable {
 
-  //  def toUnlabeledTicket = UnlabeledTicket(id, description.map(TextCleaning.clean))
-  //  def toLabeledTicket = LabeledTicket(id, description, assignedTo)
-  def toUnlabeledTicket = UnlabeledTicket(description.map(TextCleaning.clean))
-  def toLabeledTicket = LabeledTicket(description, assignedTo)
+  def toTicketSummary = TicketSummary(id, description.map(TextCleaning.clean))
+  def toLabeledTicket = LabeledTicket(description.map(TextCleaning.clean), assignedTo)
 
 }
 
-case class UnlabeledTicket(
-  //  id: Option[UUID],
+case class TicketSummary(
+  id: Option[Long],
   description: Option[String]
 ) extends Serializable
 
 case class LabeledTicket(
-  //  id: Option[UUID],
   description: Option[String],
   assignedTo: Option[String]
 ) extends Serializable

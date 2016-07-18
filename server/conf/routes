@@ -35,8 +35,12 @@ POST        /reset-password                controllers.ResetPasswordController.s
 GET         /ticket                        controllers.TicketController.view
 POST        /ticket                        controllers.TicketController.submit
 
-GET         /ticket/:uuid                  controllers.TicketController.detail(uuid: String)
+GET         /ticket/:id                    controllers.TicketController.detail(id: Long)
 
-GET         /classify/:uuid                controllers.ActorController.classify(uuid: String)
+GET         /classify/:id                  controllers.ActorController.classify(id: Long)
 
 GET         /build                         controllers.ActorController.build
+
+GET         /ws                            controllers.ActorController.socket
+
+GET         /similar/:id                   controllers.ActorController.similar(id: Long)

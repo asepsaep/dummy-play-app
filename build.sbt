@@ -27,6 +27,7 @@ lazy val versions = new {
   val playBootstrap = "1.0-P25-B3"
   val playScalaJS = "0.5.0"
   val playScalatest = "1.5.1"
+  val mockito = "2.0.2-beta"
 
   val dom = "0.9.0"
   val jquery = "0.9.0"
@@ -36,6 +37,7 @@ lazy val versions = new {
 lazy val commonSettings = Seq(
   version := appV,
   scalaVersion := scalaV,
+  scalacOptions ++= compilerOptions,
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
   resolvers += Resolver.jcenterRepo,
   ScalariformKeys.preferences := ScalariformKeys.preferences.value
@@ -69,6 +71,8 @@ lazy val server = (project in file("server"))
     scalaJSProjects := clients,
     pipelineStages := Seq(scalaJSProd, gzip),
     libraryDependencies ++= Seq(
+      cache,
+      filters,
       "com.mohiva" %% "play-silhouette" % versions.silhouette,
       "com.mohiva" %% "play-silhouette-password-bcrypt" % versions.silhouette,
       "com.mohiva" %% "play-silhouette-persistence" % versions.silhouette,
@@ -96,8 +100,7 @@ lazy val server = (project in file("server"))
       "com.vmunier" %% "play-scalajs-scripts" % versions.playScalaJS,
       "com.mohiva" %% "play-silhouette-testkit" % versions.silhouette % "test",
       "org.scalatestplus.play" %% "scalatestplus-play" % versions.playScalatest % "test",
-      cache,
-      filters
+      "org.mockito" % "mockito-all" % versions.mockito % "test"
     )
   ).enablePlugins(PlayScala)
     .disablePlugins(SbtScalariform)
@@ -127,7 +130,7 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared"))
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-scalacOptions ++= Seq(
+lazy val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   "-unchecked", // Enable additional warnings where generated code depends on assumptions.

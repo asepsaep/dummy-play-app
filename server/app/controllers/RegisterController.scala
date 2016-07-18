@@ -70,6 +70,7 @@ class RegisterController @Inject() (
           case None ⇒
             val authInfo = passwordHasher.hash(data.password)
             val account = Account(
+              id = None,
               providerId = loginInfo.providerID,
               providerKey = loginInfo.providerKey,
               username = data.username,

@@ -5,6 +5,7 @@ import java.time.OffsetDateTime
 import com.mohiva.play.silhouette.api.{ Identity, LoginInfo }
 
 case class Account(
+  id: Option[Long],
   username: String,
   name: Option[String],
   email: Option[String],
@@ -21,6 +22,7 @@ case class Account(
 
   override def toString = {
     s"""
+       |Id = $id
        |Username = $username
        |Name = $name
        |Email = $email

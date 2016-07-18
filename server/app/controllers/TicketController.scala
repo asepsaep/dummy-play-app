@@ -1,6 +1,5 @@
 package controllers
 
-import java.util.UUID
 import javax.inject.{ Inject, Singleton }
 
 import com.mohiva.play.silhouette.api._
@@ -37,8 +36,8 @@ class TicketController @Inject() (
     Future.successful(Ok(views.html.ticket(TicketForm.form)))
   }
 
-  def detail(uuid: String) = silhouette.UserAwareAction.async { implicit request ⇒
-    ticketDAO.find(UUID.fromString(uuid)).flatMap {
+  def detail(id: Long) = silhouette.UserAwareAction.async { implicit request ⇒
+    ticketDAO.find(id).flatMap {
       case None         ⇒ Future.successful(Redirect(routes.ApplicationController.index()).flashing("error" → "Ticket not found"))
       case Some(ticket) ⇒ Future.successful(Ok(views.html.ticketDetail(ticket)))
     }
@@ -59,7 +58,7 @@ class TicketController @Inject() (
       form ⇒ Future.successful(BadRequest(views.html.ticket(form))),
       data ⇒ {
         val ticket = Ticket(
-          id = Some(UUID.randomUUID()),
+          id = None,
           reporter = Some(request.identity.username),
           reporterName = request.identity.name,
           assignedTo = None,

@@ -55,6 +55,7 @@ class AccountServiceImpl @Inject() (accountDAO: AccountDAO) extends AccountServi
         ))
       case None ⇒
         accountDAO.save(Account(
+          id = None,
           username = util.Random.alphanumeric.take(30).mkString,
           name = profile.fullName,
           email = profile.email,

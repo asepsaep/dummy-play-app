@@ -18,6 +18,7 @@ trait AccountDAO {
   def findByEmail(email: String): Future[Option[Account]]
   def save(account: Account): Future[Account]
   def count: Future[Int]
+  def find(id: Long): Future[Option[Account]]
   def find(username: String): Future[Option[Account]]
   def findByLoginInfoAlongWithEmail(username: String, email: String): Future[Option[Account]]
   def findByLoginInfo(loginInfo: LoginInfo): Future[Option[Account]]
@@ -49,6 +50,10 @@ class AccountDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigPr
 
   override def find(username: String): Future[Option[Account]] = {
     findBy(_.username.toLowerCase === username.toLowerCase)
+  }
+
+  override def find(id: Long): Future[Option[Account]] = {
+    findBy(_.id === id)
   }
 
   override def findCredentialsAccount(email: String): Future[Option[Account]] = {
@@ -90,8 +95,8 @@ class AccountDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigPr
     existingUserFuture.flatMap {
       case None ⇒ db.run(
         for {
-          i ← (Accounts += account)
-        } yield account
+          i ← Accounts.returning(Accounts.map(_.id)).into((item, id) ⇒ item.copy(id = Some(id))) += account
+        } yield i
       )
       case Some(_) ⇒ db.run(
         for {

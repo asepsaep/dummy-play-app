@@ -1,6 +1,5 @@
 package models.daos
 
-import java.util.UUID
 import javax.inject.Inject
 
 import play.api.db.slick.{ DatabaseConfigProvider, HasDatabaseConfigProvider }
@@ -14,7 +13,7 @@ import models._
 import play.api.Logger
 
 trait TicketDAO {
-  def find(id: UUID): Future[Option[Ticket]]
+  def find(id: Long): Future[Option[Ticket]]
   def findFrom(reporter: String): Future[Seq[Ticket]]
   def findTo(assignedTo: String): Future[Seq[Ticket]]
   def findByStatus(status: String): Future[Seq[Ticket]]
@@ -23,7 +22,7 @@ trait TicketDAO {
   def all(page: Int, pageSize: Int): Future[Seq[Ticket]]
   def save(ticket: Ticket): Future[Ticket]
   def count: Future[Int]
-  def delete(id: UUID): Future[Unit]
+  def delete(id: Long): Future[Unit]
 }
 
 class TicketDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider) extends TicketDAO with HasDatabaseConfigProvider[JdbcProfile] {
@@ -38,7 +37,7 @@ class TicketDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigPro
       case e ⇒ Logger.error(e.getMessage, e); List.empty
     }
 
-  override def find(id: UUID): Future[Option[Ticket]] = {
+  override def find(id: Long): Future[Option[Ticket]] = {
     db.run(Tickets.filter(_.id === id).result.headOption)
   }
 
@@ -62,7 +61,7 @@ class TicketDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     db.run(Tickets.sortBy(_.createdAt.desc).drop(page * pageSize).take(pageSize).result)
   }
 
-  override def delete(id: UUID): Future[Unit] = {
+  override def delete(id: Long): Future[Unit] = {
     db.run(Tickets.filter(_.id === id).delete).map(_ ⇒ {})
   }
 
@@ -70,14 +69,14 @@ class TicketDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     ticket.id match {
       case None ⇒ db.run(
         for {
-          i ← (Tickets += ticket)
-        } yield ticket
+          i ← Tickets.returning(Tickets.map(_.id)).into((item, id) ⇒ item.copy(id = Some(id))) += ticket
+        } yield i
       )
       case Some(id) ⇒ find(id).flatMap {
         case None ⇒ db.run(
           for {
-            i ← (Tickets += ticket)
-          } yield ticket
+            i ← Tickets.returning(Tickets.map(_.id)).into((item, id) ⇒ item.copy(id = Some(id))) += ticket
+          } yield i
         )
         case Some(_) ⇒ db.run(
           for {

@@ -14,21 +14,21 @@ import models._
 import play.api.Logger
 
 trait MilestoneDAO {
-  def find(ticketId: UUID): Future[Seq[Milestone]]
-  def findById(id: UUID): Future[Option[Milestone]]
+  def find(ticketId: Long): Future[Seq[Milestone]]
+  def findById(id: Long): Future[Option[Milestone]]
   def findFrom(reporter: String): Future[Seq[Milestone]]
   def all: Future[Seq[Milestone]]
   def all(page: Int, pageSize: Int): Future[Seq[Milestone]]
   def save(milestone: Milestone): Future[Milestone]
   def count: Future[Int]
-  def delete(id: UUID): Future[Unit]
+  def delete(id: Long): Future[Unit]
 }
 
 class MilestoneDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfigProvider) extends MilestoneDAO with HasDatabaseConfigProvider[JdbcProfile] {
 
   private val Milestones = TableQuery[MilestoneTable]
 
-  override def find(ticketId: UUID): Future[Seq[Milestone]] = {
+  override def find(ticketId: Long): Future[Seq[Milestone]] = {
     db.run(Milestones.filter(_.ticketId === ticketId).sortBy(_.datetime.desc).result)
   }
 
@@ -36,7 +36,7 @@ class MilestoneDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfig
     db.run(Milestones.filter(_.milestoneReporter === reporter).sortBy(_.datetime.desc).result)
   }
 
-  override def findById(id: UUID): Future[Option[Milestone]] = {
+  override def findById(id: Long): Future[Option[Milestone]] = {
     db.run(Milestones.filter(_.id === id).result.headOption)
   }
 
@@ -52,7 +52,7 @@ class MilestoneDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfig
     db.run(Milestones.sortBy(_.ticketId).drop(page * pageSize).take(pageSize).result)
   }
 
-  override def delete(id: UUID): Future[Unit] = {
+  override def delete(id: Long): Future[Unit] = {
     db.run(Milestones.filter(_.id === id).delete).map(_ ⇒ {})
   }
 
@@ -60,14 +60,14 @@ class MilestoneDAOImpl @Inject() (protected val dbConfigProvider: DatabaseConfig
     milestone.id match {
       case None ⇒ db.run(
         for {
-          i ← (Milestones += milestone)
-        } yield milestone
+          i ← Milestones.returning(Milestones.map(_.id)).into((item, id) ⇒ item.copy(id = Some(id))) += milestone
+        } yield i
       )
       case Some(id) ⇒ findById(id).flatMap {
         case None ⇒ db.run(
           for {
-            i ← (Milestones += milestone)
-          } yield milestone
+            i ← Milestones.returning(Milestones.map(_.id)).into((item, id) ⇒ item.copy(id = Some(id))) += milestone
+          } yield i
         )
         case Some(_) ⇒ db.run(
           for {

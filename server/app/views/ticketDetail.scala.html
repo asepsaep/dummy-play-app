@@ -1,7 +1,5 @@
 @import play.api.Environment
 @import b3.inline.fieldConstructor
-@import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
-@import com.nappin.play.recaptcha.WidgetHelper
 @import utils.AppMode
 
 @(ticket: Ticket)(
@@ -9,7 +7,6 @@
         messages: Messages,
         webJarAssets: WebJarAssets,
         environment: Environment,
-        widgetHelper: WidgetHelper,
         appMode: AppMode
 )
 
@@ -17,9 +14,11 @@
 
   <legend>@Messages("ticket.tagline")</legend>
 
+  <strong>ID</strong> @ticket.id.getOrElse("0")<br>
   <strong>Title</strong> @ticket.title.getOrElse("Title")<br>
   <strong>Description</strong> @ticket.description.getOrElse("Description")<br>
   <strong>Submitted By</strong> @ticket.reporter.getOrElse("Reporter") (@ticket.reporterName.getOrElse("Reporter Name"))<br>
+  <strong>Assigned To</strong> @ticket.assignedTo.getOrElse("<NONE>") (@ticket.assignedToName.getOrElse("<NONE>"))<br>
   <strong>Created at </strong> @ticket.createdAt.toString<br>
 
 }

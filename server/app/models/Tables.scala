@@ -7,6 +7,7 @@ import modules.MyPostgresDriver.api._
 
 class AccountTable(tag: Tag) extends Table[Account](tag, "account") {
 
+  def id = column[Long]("id", O.AutoInc)
   def username = column[String]("username", O.PrimaryKey)
   def name = column[String]("name")
   def email = column[String]("email")
@@ -19,6 +20,7 @@ class AccountTable(tag: Tag) extends Table[Account](tag, "account") {
   def providerKey = column[String]("provider_key")
 
   override def * = (
+    id.?,
     username,
     name.?,
     email.?,
@@ -87,7 +89,7 @@ class TokenInfoTable(tag: Tag) extends Table[TokenInfo](tag, "token_info") {
 
 class TicketTable(tag: Tag) extends Table[Ticket](tag, "ticket") {
 
-  def id = column[UUID]("id", O.PrimaryKey)
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def reporter = column[String]("reporter")
   def reporterName = column[String]("reporter_name")
   def assignedTo = column[String]("assigned_to")
@@ -121,10 +123,19 @@ class TicketTable(tag: Tag) extends Table[Ticket](tag, "ticket") {
 
 }
 
+class LabeledTicketTable(tag: Tag) extends Table[LabeledTicket](tag, "labeled_ticket") {
+
+  def description = column[String]("description")
+  def assignedTo = column[String]("assigned_to")
+
+  override def * = (description.?, assignedTo.?) <> ((LabeledTicket.apply _).tupled, LabeledTicket.unapply _)
+
+}
+
 class MilestoneTable(tag: Tag) extends Table[Milestone](tag, "milestone") {
 
-  def id = column[UUID]("id")
-  def ticketId = column[UUID]("ticket_id")
+  def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def ticketId = column[Long]("ticket_id")
   def datetime = column[OffsetDateTime]("datetime")
   def description = column[String]("description")
   def milestoneReporter = column[String]("milestone_reporter")
