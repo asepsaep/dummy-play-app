@@ -1,24 +1,24 @@
 package controllers
 
-import javax.inject.{Inject, Named, Singleton}
+import javax.inject.{ Inject, Named, Singleton }
 
-import actors.Classifier.{ClassificationResult, Classify}
+import actors.Classifier.{ ClassificationResult, Classify }
 import akka.pattern._
-import actors.{Director, WebSocketActor}
+import actors.{ Director, WebSocketActor }
 import actors.Director._
-import actors.SimilarTicketFinder.{NormalizedTicket, NormalizedTicketsPair, Similar, TicketSimilarity}
-import akka.actor.{ActorRef, ActorSystem}
+import actors.SimilarTicketFinder.{ NormalizedTicket, NormalizedTicketsPair, Similar, TicketSimilarity }
+import akka.actor.{ ActorRef, ActorSystem }
 import akka.stream.Materializer
 import akka.util.Timeout
-import com.mohiva.play.silhouette.api.{EventBus, Silhouette}
-import models.{LabeledTicket, Ticket, TicketSummary}
-import models.daos.{AccountDAO, TicketDAO}
+import com.mohiva.play.silhouette.api.{ EventBus, Silhouette }
+import models.{ LabeledTicket, Ticket, TicketSummary }
+import models.daos.{ AccountDAO, TicketDAO }
 import org.apache.spark.SparkContext
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.streams.ActorFlow
-import play.api.{Environment, Logger}
-import play.api.mvc.{Action, Controller, WebSocket}
+import play.api.{ Environment, Logger }
+import play.api.mvc.{ Action, Controller, WebSocket }
 import utils.AppMode
 import utils.auth.DefaultEnv
 
@@ -87,15 +87,15 @@ class ActorController @Inject() (
           similarityFinder ← (director ? GetTicketSimilarity).mapTo[ActorRef]
           similarityResult ← (similarityFinder ? Similar(ticket)).map {
             case array: Array[NormalizedTicketsPair] ⇒ array
-            case a @ e                              ⇒
+            case a @ e ⇒
               Logger.info(a.getClass.toString)
               Array[NormalizedTicketsPair]()
           }
         } yield similarityResult
         result.flatMap { content ⇒
-          val similarTicket = content.map { t =>
+          val similarTicket = content.map { t ⇒
             TicketSimilarity(t.t1.id, cosineSimilarity(t.t1.vector, t.t2.vector))
-          }.sortBy(t => -t.similarity)
+          }.sortBy(t ⇒ -t.similarity)
           Future.successful(Ok(similarTicket.take(11).mkString("\n")))
         }
       }
@@ -106,7 +106,7 @@ class ActorController @Inject() (
     val nominator = (for (i ← vectorA.indices) yield (vectorA(i) * vectorB(i))).sum
     val denominator = math.sqrt(vectorA.map(v ⇒ v * v).sum) * math.sqrt(vectorB.map(v ⇒ v * v).sum)
     val cosineSimilartyResult = nominator / denominator
-//    Logger.debug(s"Nominator / Denominator = $nominator / $denominator = $cosineSimilartyResult")
+    //    Logger.debug(s"Nominator / Denominator = $nominator / $denominator = $cosineSimilartyResult")
     cosineSimilartyResult
   }
 

@@ -14,8 +14,8 @@ class WebSocketActor(out: ActorRef, sparkContext: SparkContext, director: ActorR
   override def receive: Receive = {
 
     case message: String ⇒ message match {
-      case "build"     ⇒ director ! BuildModel
-      case any: String ⇒ out ! any
+      case "buildModel"  ⇒ director ! BuildModel
+      case any: String   ⇒ out ! any
     }
 
   }

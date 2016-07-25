@@ -67,7 +67,7 @@ class CorpusInitializer(sparkContext: SparkContext, batchTrainer: ActorRef) exte
           TicketSummary(Some(row.getAs[Long]("id")), Some(row.getAs[String]("description")))
       }
       log.debug("Telling sender...")
-      sender ! FindSimilar(data)
+      sender ! TicketSummaryCorpus(data)
 
     }
 

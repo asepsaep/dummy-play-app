@@ -34,21 +34,28 @@ class Director(sparkContext: SparkContext) extends Actor with ActorLogging {
   var corpusInitializer: ActorRef = _
   var similarityFinder: ActorRef = _
 
+  var initialized = false
+
   val predictor = new Predictor(sparkContext)
 
   override def receive: Receive = LoggingReceive {
 
-    case GetClassifier         ⇒ sender ! classifier
-    case GetTicketSimilarity   ⇒ sender ! similarityFinder
-    case BatchTrainingFinished ⇒ batchTrainer ! GetLatestModel
-    case BuildModel            ⇒ corpusInitializer.tell(LoadLabeledTicketFromDB, batchTrainer)
+    case GetClassifier           ⇒ sender ! classifier
+    case GetTicketSimilarity     ⇒ sender ! similarityFinder
+    case BatchTrainingFinished   ⇒ batchTrainer ! GetLatestModel
+    case BuildModel              ⇒ corpusInitializer.tell(LoadLabeledTicketFromDB, batchTrainer)
 
     case CreateWebSocketActor(props) ⇒
       webSocketActor = context.actorOf(props)
-      batchTrainer = context.actorOf(BatchTrainer.props(sparkContext, self, webSocketActor), "batch-trainer")
-      corpusInitializer = context.actorOf(CorpusInitializer.props(sparkContext, batchTrainer), "corpus-initializer")
-      classifier = context.actorOf(Classifier.props(sparkContext, batchTrainer, predictor), "classifier")
-      similarityFinder = context.actorOf(SimilarTicketFinder.props(sparkContext, self, corpusInitializer, webSocketActor), "similarity-finder")
+      if (!initialized) {
+        batchTrainer = context.actorOf(BatchTrainer.props(sparkContext, self, webSocketActor), "batch-trainer")
+        corpusInitializer = context.actorOf(CorpusInitializer.props(sparkContext, batchTrainer), "corpus-initializer")
+        classifier = context.actorOf(Classifier.props(sparkContext, batchTrainer, predictor), "classifier")
+        similarityFinder = context.actorOf(SimilarTicketFinder.props(sparkContext, self, corpusInitializer, webSocketActor), "similarity-finder")
+
+        initialized = true
+        self ! BuildModel
+      }
 
     case BatchTrainerModel(model) ⇒ log.info("Got BatchTrainerModel")
     case undefined                ⇒ log.info(s"Unexpected message $undefined")

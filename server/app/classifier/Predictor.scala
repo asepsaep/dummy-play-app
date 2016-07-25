@@ -6,13 +6,13 @@ import javax.inject.Inject
 import actors.BatchTrainer.BatchTrainerModel
 import actors.SimilarTicketFinder.TicketSimilarity
 import models.daos.AccountDAO
-import models.{LabeledTicket, Ticket}
+import models.{ LabeledTicket, Ticket }
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.Transformer
 import org.apache.spark.mllib.classification.LogisticRegressionModel
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.sql.{ Row, SQLContext }
 
 trait PredictorProxy {
   def predict(batchTrainerModel: Transformer, Ticket: Ticket): Array[Ticket]
