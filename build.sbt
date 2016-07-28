@@ -12,7 +12,8 @@ lazy val clients = Seq(client)
 lazy val versions = new {
 
   val silhouette = "4.0.0-RC1"
-  val spark = "1.6.1"
+  val spark = "2.0.0"
+  val hadoop = "2.7.0"
   val akka = "2.4.7"
   val slick = "3.1.1"
   val playSlick = "2.0.0"
@@ -37,7 +38,7 @@ lazy val versions = new {
 lazy val commonSettings = Seq(
   version := appV,
   scalaVersion := scalaV,
-  scalacOptions ++= compilerOptions,
+  scalacOptions ++= scalaCompilerOptions,
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
   resolvers += Resolver.jcenterRepo,
   ScalariformKeys.preferences := ScalariformKeys.preferences.value
@@ -69,6 +70,7 @@ lazy val server = (project in file("server"))
     connectInput in run := true,
     routesGenerator := InjectedRoutesGenerator,
     scalaJSProjects := clients,
+    javaOptions ++= jvmOptions,
     pipelineStages := Seq(scalaJSProd, gzip),
     libraryDependencies ++= Seq(
       cache,
@@ -81,7 +83,8 @@ lazy val server = (project in file("server"))
       "org.apache.spark" %% "spark-sql" % versions.spark,
       "org.apache.spark" %% "spark-mllib" % versions.spark,
       "org.apache.spark" %% "spark-streaming" % versions.spark,
-      "org.apache.spark" %% "spark-streaming-twitter" % versions.spark,
+//      "org.apache.spark" %% "spark-streaming-twitter" % versions.spark,
+      "org.apache.hadoop" % "hadoop-client" % versions.hadoop,
       "com.fasterxml.jackson.core" % "jackson-databind" % versions.jackson,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.jackson,
       "com.typesafe.akka" % "akka-actor_2.11" % versions.akka,
@@ -130,7 +133,7 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared"))
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-lazy val compilerOptions = Seq(
+lazy val scalaCompilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   "-unchecked", // Enable additional warnings where generated code depends on assumptions.
@@ -141,6 +144,13 @@ lazy val compilerOptions = Seq(
   "-Ywarn-inaccessible", // Warn about inaccessible types in method signatures.
   "-Ywarn-nullary-override", // Warn when non-nullary overrides nullary, e.g. def foo() over def foo.
   "-Ywarn-numeric-widen" // Warn when numerics are widened.
+)
+
+lazy val jvmOptions = Seq(
+  "-Xms256M",
+  "-Xmx2G",
+  "-XX:MaxPermSize=2048M",
+  "-XX:+UseConcMarkSweepGC"
 )
 
 // onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value

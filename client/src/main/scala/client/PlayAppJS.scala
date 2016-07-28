@@ -33,6 +33,11 @@ object PlayAppJS extends js.JSApp {
     ws.send("buildModel")
   }
 
+  @JSExport
+  def buildCorpus() = {
+    ws.send("buildCorpus")
+  }
+
   //  @JSExport
   //  def initWS() = {
   //    Console.println("Init WebSocket button clicked")

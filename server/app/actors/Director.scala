@@ -8,13 +8,14 @@ import akka.event.LoggingReceive
 import classifier.Predictor
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SparkSession
 import play.api.libs.concurrent.Execution.Implicits._
 
 import scala.concurrent.duration._
 
 object Director {
 
-  def props(sparkContext: SparkContext) = Props(new Director(sparkContext))
+  def props(sparkContext: SparkContext, sparkSession: SparkSession) = Props(new Director(sparkContext, sparkSession))
 
   case object BuildModel
   case object GetClassifier
@@ -24,7 +25,7 @@ object Director {
 
 }
 
-class Director(sparkContext: SparkContext) extends Actor with ActorLogging {
+class Director(sparkContext: SparkContext, sparkSession: SparkSession) extends Actor with ActorLogging {
 
   import Director._
 
@@ -36,7 +37,7 @@ class Director(sparkContext: SparkContext) extends Actor with ActorLogging {
 
   var initialized = false
 
-  val predictor = new Predictor(sparkContext)
+  val predictor = new Predictor(sparkContext, sparkSession)
 
   override def receive: Receive = LoggingReceive {
 
@@ -44,17 +45,18 @@ class Director(sparkContext: SparkContext) extends Actor with ActorLogging {
     case GetTicketSimilarity     ⇒ sender ! similarityFinder
     case BatchTrainingFinished   ⇒ batchTrainer ! GetLatestModel
     case BuildModel              ⇒ corpusInitializer.tell(LoadLabeledTicketFromDB, batchTrainer)
+    case InitTicketSummary  => similarityFinder ! InitTicketSummary
 
     case CreateWebSocketActor(props) ⇒
       webSocketActor = context.actorOf(props)
       if (!initialized) {
-        batchTrainer = context.actorOf(BatchTrainer.props(sparkContext, self, webSocketActor), "batch-trainer")
-        corpusInitializer = context.actorOf(CorpusInitializer.props(sparkContext, batchTrainer), "corpus-initializer")
-        classifier = context.actorOf(Classifier.props(sparkContext, batchTrainer, predictor), "classifier")
-        similarityFinder = context.actorOf(SimilarTicketFinder.props(sparkContext, self, corpusInitializer, webSocketActor), "similarity-finder")
+        batchTrainer = context.actorOf(BatchTrainer.props(sparkContext, sparkSession, self, webSocketActor), "batch-trainer")
+        corpusInitializer = context.actorOf(CorpusInitializer.props(sparkContext, sparkSession, batchTrainer), "corpus-initializer")
+        classifier = context.actorOf(Classifier.props(sparkContext, sparkSession, batchTrainer, predictor), "classifier")
+        similarityFinder = context.actorOf(SimilarTicketFinder.props(sparkContext, sparkSession, self, corpusInitializer, webSocketActor), "similarity-finder")
 
         initialized = true
-        self ! BuildModel
+        // self ! BuildModel
       }
 
     case BatchTrainerModel(model) ⇒ log.info("Got BatchTrainerModel")

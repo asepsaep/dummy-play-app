@@ -15,6 +15,7 @@ class WebSocketActor(out: ActorRef, sparkContext: SparkContext, director: ActorR
 
     case message: String ⇒ message match {
       case "buildModel"  ⇒ director ! BuildModel
+      case "buildCorpus"  ⇒ director ! InitTicketSummary
       case any: String   ⇒ out ! any
     }
 

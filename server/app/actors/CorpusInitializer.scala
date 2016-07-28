@@ -1,18 +1,18 @@
 package actors
 
-import akka.actor.{ Actor, ActorLogging, ActorRef, Props }
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.event.LoggingReceive
-import com.typesafe.config.{ Config, ConfigFactory }
-import models.{ LabeledTicket, Ticket, TicketSummary }
+import com.typesafe.config.{Config, ConfigFactory}
+import models.{LabeledTicket, Ticket, TicketSummary}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.streaming.{ Duration, StreamingContext }
+import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.streaming.{Duration, StreamingContext}
 import net.ceedubs.ficus.Ficus._
 
 object CorpusInitializer {
 
-  def props(sparkContext: SparkContext, batchTrainer: ActorRef) = Props(new CorpusInitializer(sparkContext, batchTrainer))
+  def props(sparkContext: SparkContext, sparkSession: SparkSession, batchTrainer: ActorRef) = Props(new CorpusInitializer(sparkContext, sparkSession, batchTrainer))
 
   case object InitFromStream
   case object LoadTicketSummaryFromDB
@@ -21,10 +21,10 @@ object CorpusInitializer {
 
 }
 
-class CorpusInitializer(sparkContext: SparkContext, batchTrainer: ActorRef) extends Actor with ActorLogging {
+class CorpusInitializer(sparkContext: SparkContext, sparkSession: SparkSession, batchTrainer: ActorRef) extends Actor with ActorLogging {
 
   import CorpusInitializer._
-  val sqlContext = new SQLContext(sparkContext)
+  val sqlContext = sparkSession.sqlContext
   import sqlContext.implicits._
 
   override def receive: Receive = LoggingReceive {
@@ -37,7 +37,7 @@ class CorpusInitializer(sparkContext: SparkContext, batchTrainer: ActorRef) exte
       val dbPassword = config.as[String]("db.ticket.password")
 
       log.debug("Load from db....")
-      val opts = Map("url" → s"$dbUrl?user=$dbUser&password=$dbPassword", "dbtable" → dbTable)
+      val opts = Map("url" → s"$dbUrl?user=$dbUser&password=$dbPassword", "dbtable" → dbTable, "driver" -> "org.postgresql.Driver")
       log.debug(s"Option = $opts")
       val df = sqlContext.read.format("jdbc").options(opts).load()
       log.debug("Data frame created." + df.printSchema() + "\n" + df.first())
